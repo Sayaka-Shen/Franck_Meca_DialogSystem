@@ -1016,7 +1016,7 @@ MonoBehaviour:
   choiceButtonPrefab: {fileID: 2398417510064589081, guid: f280db88b1df2844a867fc51e18a97e0, type: 3}
   ChoiceButtonContainer: {fileID: 1463298655}
   SpeakerDatatable: {fileID: 11400000, guid: 73df5f3c393cf35438d90e0ad29545db, type: 2}
-  HumeurImage: {fileID: 1209131581}
+  SpeakerHumeur: {fileID: 1209131581}
 --- !u!1 &1463298654
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,14 +3,16 @@ using UnityEditor.AssetImporters;
 using Unity.GraphToolkit.Editor;
 using System;
 using System.Collections.Generic;
+using DialogueGraph.Shared;
 using System.Linq;
+using Unity.GraphToolkit;
 
-[ScriptedImporter(1, DialogueGraph.AssetExtension)]
+[ScriptedImporter(1, DialogueGraphClass.AssetExtension)]
 public class DialogueGraphImporter : ScriptedImporter
 {
     public override void OnImportAsset(AssetImportContext ctx)
     {
-        DialogueGraph editorGraph = GraphDatabase.LoadGraphForImporter<DialogueGraph>(ctx.assetPath);
+        DialogueGraphClass editorGraph = GraphDatabase.LoadGraphForImporter<DialogueGraphClass>(ctx.assetPath);
         RuntimeDialogueGraph runtimeGraph = ScriptableObject.CreateInstance<RuntimeDialogueGraph>();
         Dictionary<INode, string> nodeIdMap = new Dictionary<INode, string>();
 
@@ -57,19 +59,32 @@ public class DialogueGraphImporter : ScriptedImporter
         runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
         runtimeNode.DialogueText = GetPortValue<string>(node.GetInputPortByName("Dialogue"));
 
+        // Speaker
+        runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
+        // when save if key doesn't exit print error
+
+        runtimeNode.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
+
         IPort nextNodePort = node.GetOutputPortByName("out")?.firstConnectedPort;
         if (nextNodePort != null)
         {
             runtimeNode.NextNodeId = nodeIdMap[nextNodePort.GetNode()];
         }
+
+
     }
 
     private void ProcessChoiceNode(ChoiceNode node, RuntimeDialogueNode runtimeNode,
         Dictionary<INode, string> nodeIdMap)
     {
+        // dialogue 
         runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
         runtimeNode.DialogueText = GetPortValue<string>(node.GetInputPortByName("Dialogue"));
 
+        //speaker
+        runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
+
+        // choice
         var choiceOutputPorts = node.GetOutputPorts().Where(p => p.name.StartsWith("Choice "));
 
         foreach(var outputPort in choiceOutputPorts)
@@ -105,4 +120,7 @@ public class DialogueGraphImporter : ScriptedImporter
         port.TryGetValue(out T fallbackValue);
         return fallbackValue;
     }
+
+
+
 }

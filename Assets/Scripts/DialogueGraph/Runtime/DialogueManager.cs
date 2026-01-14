@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using DialogueGraph.Shared;
 using TMPro;
 using Unity.GraphToolkit.Editor;
 using UnityEngine;
@@ -16,9 +17,13 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI SpeakerNameText;
     public TextMeshProUGUI DialogueText;
 
-    [Header(" Choice Button UI")]
+    [Header("Choice Button UI")]
     public Button choiceButtonPrefab;
     public Transform ChoiceButtonContainer;
+
+    [Header("Speaker")]
+    [SerializeField] private SpeakerDatatable SpeakerDatatable;
+    [SerializeField] private RawImage HumeurImage;
 
     
     private Dictionary<string, RuntimeDialogueNode> _nodeLookup = new Dictionary<string, RuntimeDialogueNode>();
@@ -65,18 +70,22 @@ public class DialogueManager : MonoBehaviour
         }
         
         _currentNode = _nodeLookup[nodeId];
-        
+        SpeakerData currentSpeaker = SpeakerDatatable.GetSpeakerByKey(_currentNode.SpeakerKey);
+        if (currentSpeaker == null)
+            Debug.LogError($"Key Speaker {_currentNode.SpeakerKey} doesn't exist.");
+
+        // -- dialogue --
+
         DialoguePanel.SetActive(true);
-        SpeakerNameText.SetText(_currentNode.SpeakerName);
+        SpeakerNameText.SetText(currentSpeaker.Name);
         DialogueText.SetText(_currentNode.DialogueText);
            
-        // clean previous choices
+        // -- choices --
         foreach (Transform child in ChoiceButtonContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // spawn choices
         if (_currentNode.Choices.Count > 0)
         {
             foreach (var choice in _currentNode.Choices)
@@ -104,6 +113,14 @@ public class DialogueManager : MonoBehaviour
                     });
                 }
             }
+        }
+
+        // -- speaker --
+
+        if (_currentNode.SpeakerHumeur != HUMEUR.Defaut)
+        {
+            Texture2D text2D = currentSpeaker.GetTextByHumeur(_currentNode.SpeakerHumeur);
+            if(text2D != null) HumeurImage.texture = text2D;
         }
     }
 

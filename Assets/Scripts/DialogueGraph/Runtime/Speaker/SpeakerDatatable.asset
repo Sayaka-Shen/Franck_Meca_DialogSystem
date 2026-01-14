@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6eeff59bab26b48acf253780452e70, type: 3}
+  m_Name: SpeakerDatatable
+  m_EditorClassIdentifier: Assembly-CSharp::SpeakerDatatable
+  datas:
+  - Name: Luc Trimard
+    Key: SPK_LT
+    HumeurText:
+    - Label: angry
+      Humeur: 2
+      Text2D: {fileID: 2800000, guid: ebc1c296ae5d7634ea2937643868e5d1, type: 3}
+    - Label: happy
+      Humeur: 1
+      Text2D: {fileID: 2800000, guid: 37044bfc192a6af4c875217f6a59141f, type: 3}
+  - Name: Lucie Marie
+    Key: SPK_LM
+    HumeurText:
+    - Label: 
+      Humeur: 0
+      Text2D: {fileID: 0}

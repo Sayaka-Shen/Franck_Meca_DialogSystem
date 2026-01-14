@@ -4,13 +4,13 @@ using UnityEditor;
 
 [Serializable]
 [Graph(AssetExtension)]
-public class DialogueGraph : Graph
+public class DialogueGraphClass : Graph
 {
     public const string AssetExtension = "dialoguegraph";
     
     [MenuItem("Assets/Create/Dialogue Simplified Graph", false)]
     private static void CreateAssetFile()
     {
-        GraphDatabase.PromptInProjectBrowserToCreateNewAsset<DialogueGraph>();
+        GraphDatabase.PromptInProjectBrowserToCreateNewAsset<DialogueGraphClass>();
     }
 }

@@ -15,6 +15,9 @@ public class ChoiceNode : Node
         context.AddInputPort<string>("Speaker").Build();
         context.AddInputPort<string>("Dialogue").Build();
 
+        // Speaker
+        context.AddInputPort<string>("SpeakerKey").Build();
+
         var option = GetNodeOptionByName(optionID);
         option.TryGetValue(out int portCount);
         for (int i = 0; i < portCount; i++)
