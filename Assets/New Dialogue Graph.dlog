@@ -66,6 +66,48 @@
                 "fc7c0d29-fd0f-4c50-b814-52a3aef82242",
                 "30188eef-18dc-4beb-9479-bed5d85bb87e"
             ]
+        },
+        {
+            "GUID": "d333bbfb-a0ee-4422-a0d2-8c5a06b3d50d",
+            "Type": "DialogueGraph.NpcNode",
+            "DrawState": {
+                "Position": {
+                    "serializedVersion": "2",
+                    "x": 715.2000732421875,
+                    "y": 139.1999969482422,
+                    "width": 440.800048828125,
+                    "height": 250.40000915527345
+                },
+                "Expanded": true
+            },
+            "NodeData": "{\"lines\":\"[{\\\"Line\\\":\\\"\\\",\\\"PortGuidA\\\":\\\"7b0b17ac-e7a6-43db-adcc-9719486e9ca6\\\",\\\"PortGuidB\\\":\\\"93d10346-864f-4a3a-84ba-c1aeed5fce4e\\\",\\\"PortGuidC\\\":\\\"d42a3c66-2d68-414f-89e0-d14fdb29abfd\\\",\\\"PortGuidD\\\":\\\"2a2fd0c3-a2f0-4cfb-8304-dbecc5a245ae\\\"}]\"}",
+            "PortData": [
+                "fb74e09e-b658-450c-924d-0f8b7eae54bf",
+                "5c277f19-e3d4-48d9-ad25-73782493494d",
+                "509c1e14-6afc-426b-9e78-1383daac7354",
+                "7b0b17ac-e7a6-43db-adcc-9719486e9ca6",
+                "93d10346-864f-4a3a-84ba-c1aeed5fce4e",
+                "d42a3c66-2d68-414f-89e0-d14fdb29abfd",
+                "2a2fd0c3-a2f0-4cfb-8304-dbecc5a245ae"
+            ]
+        },
+        {
+            "GUID": "cd91ea84-8a62-49da-bde9-371689f291dd",
+            "Type": "DialogueGraph.PropertyNode",
+            "DrawState": {
+                "Position": {
+                    "serializedVersion": "2",
+                    "x": 606.4000244140625,
+                    "y": 316.8000183105469,
+                    "width": 75.20001220703125,
+                    "height": 42.399993896484378
+                },
+                "Expanded": true
+            },
+            "NodeData": "{\"propertyGuid\":\"fae9a0d6-52fa-4bcd-88a6-caa8e1a0ce39\"}",
+            "PortData": [
+                "9754c7a4-6173-4d74-a53d-532ccf79e19a"
+            ]
         }
     ],
     "edges": [],
@@ -73,6 +115,10 @@
         {
             "Type": "DialogueGraph.ActorProperty",
             "Data": "{\"$type\":\"DialogueGraph.ActorProperty, DialogueGraph.Editor\",\"GUID\":\"067a5690-a7bc-4499-88bf-7ad27d18e308\",\"Type\":2,\"DisplayName\":\"Actor\",\"ReferenceName\":\"Actor_F1428F3C\",\"OverrideReferenceName\":\"Actor_F1428F3C\",\"Hidden\":false,\"ShortGuid\":\"F1428F3C\"}"
+        },
+        {
+            "Type": "DialogueGraph.CheckProperty",
+            "Data": "{\"$type\":\"DialogueGraph.CheckProperty, DialogueGraph.Editor\",\"GUID\":\"fae9a0d6-52fa-4bcd-88a6-caa8e1a0ce39\",\"Type\":1,\"DisplayName\":\"Check\",\"ReferenceName\":\"Check_90D19F36\",\"OverrideReferenceName\":null,\"Hidden\":false,\"ShortGuid\":\"90D19F36\"}"
         }
     ]
 }
