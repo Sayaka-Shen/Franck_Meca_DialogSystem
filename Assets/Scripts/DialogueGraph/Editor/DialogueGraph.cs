@@ -8,7 +8,7 @@ public class DialogueGraph : Graph
 {
     public const string AssetExtension = "dialoguegraph";
     
-    [MenuItem("Assets/Create/Dialogue Graph", false)]
+    [MenuItem("Assets/Create/Dialogue Simplified Graph", false)]
     private static void CreateAssetFile()
     {
         GraphDatabase.PromptInProjectBrowserToCreateNewAsset<DialogueGraph>();
