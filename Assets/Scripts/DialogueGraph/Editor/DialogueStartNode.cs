@@ -6,6 +6,6 @@ public class DialogueStartNode : Node
 {
     protected override void OnDefinePorts(IPortDefinitionContext context)
     {
-        context.AddOutputPort("Francko").Build();
+        context.AddOutputPort("out").Build();
     }
 }
