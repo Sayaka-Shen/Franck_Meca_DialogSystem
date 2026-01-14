@@ -2,28 +2,37 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using DialogueGraph.Shared;
+using UnityEditor;
 
 [Serializable]
 public class SpeakerData
 {
+    [Delayed]
     public string Name;
 
+    [Delayed]
     public string Key;
 
+    public Texture2D Sprite;
+
+    public AudioClip AudioClip;
+
+    // ---- HUMEURS ----
+    // TO EDIT
     [Serializable]
     public class HumeurClass
     {
-        public string Label; // TO EDIT automatic update 
+        [HideInInspector]public string Label; // TO EDIT automatic update 
         public HUMEUR Humeur;
         public Texture2D Text2D;
     }
 
-    public List<HumeurClass> HumeurText  = new  List<HumeurClass>(); 
+    public List<HumeurClass> Humeurs  = new  List<HumeurClass>(); 
 
     // TO EDIT check null return (T model)
     public Texture2D GetTextByHumeur(HUMEUR humeur)
     {
-        foreach (HumeurClass h in HumeurText)
+        foreach (HumeurClass h in Humeurs)
         {
             if(h.Humeur == humeur)
             {
@@ -38,8 +47,23 @@ public class SpeakerData
         return null;
     }
 
+    // ---- EDITOR ----
+    public void UpdateDebugInfo()
+    {
+        // key
+        Key = "SPK_" + Name[0];
+        for (int i = 0; i < Name.Length; i++)
+        {
+            if (Name[i] == ' ')
+                Key += Name[i+1];
+        }
 
-    
+        // Humeur debug
+        foreach (HumeurClass h in Humeurs)
+        {
+            h.Label = h.Humeur.ToString();
+        }
+    }
 }
 
 

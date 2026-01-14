@@ -23,14 +23,23 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Speaker")]
     [SerializeField] private SpeakerDatatable SpeakerDatatable;
-    [SerializeField] private RawImage HumeurImage;
+    [SerializeField] private RawImage HumeurRImage;
+    [SerializeField] private RawImage SpeakerRImage;
 
-    
+    // Sound
+    AudioSource audioSource;
+
     private Dictionary<string, RuntimeDialogueNode> _nodeLookup = new Dictionary<string, RuntimeDialogueNode>();
     private RuntimeDialogueNode _currentNode;
 
     private void Start()
     {
+        // TO EDIT
+        // audio
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) Debug.LogWarning("No Audio Source on Dialogue Manager");
+
+        // NODES
         foreach (var node in RuntimeGraph.AllNodes)
         {
             _nodeLookup[node.NodeId] = node;
@@ -44,6 +53,7 @@ public class DialogueManager : MonoBehaviour
         {
             EndDialogue();
         }
+
     }
 
     private void Update()
@@ -116,12 +126,15 @@ public class DialogueManager : MonoBehaviour
         }
 
         // -- speaker --
+        SpeakerRImage.texture = currentSpeaker.Sprite;
 
         if (_currentNode.SpeakerHumeur != HUMEUR.Defaut)
         {
             Texture2D text2D = currentSpeaker.GetTextByHumeur(_currentNode.SpeakerHumeur);
-            if(text2D != null) HumeurImage.texture = text2D;
+            HumeurRImage.texture = text2D;
         }
+
+        audioSource.PlayOneShot(currentSpeaker.AudioClip);
     }
 
     private void EndDialogue()

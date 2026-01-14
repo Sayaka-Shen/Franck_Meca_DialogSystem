@@ -23,5 +23,16 @@ public class SpeakerDatatable : ScriptableObject
         }
         return null;
     }
+
+    private void OnValidate()
+    {
+        // TO EDIT => specifique à un objet changé
+        foreach (var data in datas)
+        {
+            data.UpdateDebugInfo();
+        }
+
+        //Debug.Log("On validate");
+    }
 }
 

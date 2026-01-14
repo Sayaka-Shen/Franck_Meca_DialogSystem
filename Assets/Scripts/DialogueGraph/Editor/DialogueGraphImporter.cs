@@ -83,6 +83,7 @@ public class DialogueGraphImporter : ScriptedImporter
 
         //speaker
         runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
+        runtimeNode.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
 
         // choice
         var choiceOutputPorts = node.GetOutputPorts().Where(p => p.name.StartsWith("Choice "));

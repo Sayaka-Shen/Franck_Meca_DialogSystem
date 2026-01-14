@@ -13,18 +13,18 @@ MonoBehaviour:
   m_Name: SpeakerDatatable
   m_EditorClassIdentifier: Assembly-CSharp::SpeakerDatatable
   datas:
-  - Name: Luc Trimard
+  - Name: Lucie Tirand
     Key: SPK_LT
-    HumeurText:
-    - Label: angry
-      Humeur: 2
-      Text2D: {fileID: 2800000, guid: ebc1c296ae5d7634ea2937643868e5d1, type: 3}
-    - Label: happy
+    Sprite: {fileID: 2800000, guid: ff130d1439eb35646be499880847eca6, type: 3}
+    Humeurs:
+    - Label: SpeakerData+HumeurClass
       Humeur: 1
-      Text2D: {fileID: 2800000, guid: 37044bfc192a6af4c875217f6a59141f, type: 3}
-  - Name: Lucie Marie
-    Key: SPK_LM
-    HumeurText:
-    - Label: 
-      Humeur: 0
       Text2D: {fileID: 0}
+  - Name: Luc Minicul
+    Key: SPK_LM
+    Sprite: {fileID: 2800000, guid: 652e5791f9ce3c443a4a7cfd15677f85, type: 3}
+    Humeurs: []
+  - Name: Ellie Prout
+    Key: SPK_EP
+    Sprite: {fileID: 2800000, guid: 4d04585ccf1a26845a8253eb3c4af372, type: 3}
+    Humeurs: []
