@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+using Codice.Client.Common;
+using Unity.GraphToolkit.Editor;
+using UnityEngine;
+
+[Serializable]
+public class ChoiceNode : Node
+{
+    const string optionID = "portCount";
+    protected override void OnDefinePorts(IPortDefinitionContext context)
+    {
+        context.AddInputPort("in").Build();
+        
+        context.AddInputPort<string>("Speaker").Build();
+        context.AddInputPort<string>("Dialogue").Build();
+
+        var option = GetNodeOptionByName(optionID);
+        option.TryGetValue(out int portCount);
+        for (int i = 0; i < portCount; i++)
+        {
+            context.AddInputPort<string>($"Choice Text {i}").Build();
+            context.AddOutputPort($"Choice {i}").Build();
+        }
+    }
+
+    protected override void OnDefineOptions(INodeOptionDefinition context)
+    {
+        context.AddNodeOption<int>(optionID, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() });
+    }
+}
