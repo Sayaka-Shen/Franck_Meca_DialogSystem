@@ -24,8 +24,9 @@ public class ChoiceNode : Node
         }
     }
 
-    protected override void OnDefineOptions(INodeOptionDefinition context)
+    protected override void OnDefineOptions(IOptionDefinitionContext context)
     {
-        context.AddNodeOption<int>(optionID, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() });
+        context.AddOption<int>(optionID);
+        //, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() }
     }
 }

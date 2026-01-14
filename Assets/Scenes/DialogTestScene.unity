@@ -900,10 +900,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca05bb02cf4b1843ad173540e0eee80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
-  RuntimeGraph: {fileID: 3965311268370046156, guid: db5779cdd4efb9d458cea2e314fb213d, type: 3}
+  RuntimeGraph: {fileID: 3965311268370046156, guid: 0a67558f4651c6e49a7dbee983598168, type: 3}
   DialoguePanel: {fileID: 1434670040}
   SpeakerNameText: {fileID: 2141467007}
   DialogueText: {fileID: 1011349885}
+  choiceButtonPrefab: {fileID: 2398417510064589081, guid: f280db88b1df2844a867fc51e18a97e0, type: 3}
+  ChoiceButtonContainer: {fileID: 1463298655}
 --- !u!1 &1463298654
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,7 +959,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 4
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
