@@ -16,15 +16,24 @@ MonoBehaviour:
   - Name: Lucie Tirand
     Key: SPK_LT
     Sprite: {fileID: 2800000, guid: ff130d1439eb35646be499880847eca6, type: 3}
+    AudioClip: {fileID: 8300000, guid: 817e93f64e803d04e9cc065902987f57, type: 3}
     Humeurs:
-    - Label: SpeakerData+HumeurClass
+    - Label: Sad
+      Humeur: 3
+      Text2D: {fileID: 2800000, guid: 5abfa9310ff5da843ac568baf39a4acf, type: 3}
+    - Label: Happy
       Humeur: 1
-      Text2D: {fileID: 0}
+      Text2D: {fileID: 2800000, guid: ada27eb1719a99541b3cf1e770c625e5, type: 3}
+    - Label: Angry
+      Humeur: 2
+      Text2D: {fileID: 2800000, guid: 40caa5bb8cb116941a34cb8dd1b7d2f0, type: 3}
   - Name: Luc Minicul
     Key: SPK_LM
     Sprite: {fileID: 2800000, guid: 652e5791f9ce3c443a4a7cfd15677f85, type: 3}
+    AudioClip: {fileID: 8300000, guid: 522cf4025fb54c645bfb83b1e79dc20c, type: 3}
     Humeurs: []
   - Name: Ellie Prout
     Key: SPK_EP
     Sprite: {fileID: 2800000, guid: 4d04585ccf1a26845a8253eb3c4af372, type: 3}
+    AudioClip: {fileID: 8300000, guid: fdb3c6b44f1b9894189831bcf738011f, type: 3}
     Humeurs: []
