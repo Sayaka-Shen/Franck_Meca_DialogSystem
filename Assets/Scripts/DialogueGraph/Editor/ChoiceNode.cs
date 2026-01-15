@@ -30,7 +30,7 @@ public class ChoiceNode : Node
 
     protected override void OnDefineOptions(IOptionDefinitionContext context)
     {
-        context.AddOption<int>(optionID);
+        context.AddOption<int>(optionID).Delayed().WithDefaultValue(2);
         //, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() }
     }
 }
