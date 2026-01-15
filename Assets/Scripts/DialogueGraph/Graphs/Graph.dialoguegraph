@@ -39,21 +39,21 @@ MonoBehaviour:
           m_KeyList:
           - __option_portCount
           - Speaker
-          - Dialogue
-          - Choice Text 0
-          - Choice Text 1
-          - Choice Text 2
           - SpeakerKey
           - Humeur
+          - DialogueKey
+          - ChoiceKey 0
+          - ChoiceKey 1
+          - ChoiceKey 2
           m_ValueList:
           - rid: 3768623712953958466
           - rid: 3768623712953958467
-          - rid: 3768623712953958468
-          - rid: 3768623712953958471
-          - rid: 3768623712953958472
-          - rid: 3768623712953958486
           - rid: 3768623719143178379
           - rid: 3768623719143178459
+          - rid: 6020289403143323749
+          - rid: 6020289403143323789
+          - rid: 6020289403143323790
+          - rid: 6020289403143323791
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -77,10 +77,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Luc
-    - rid: 3768623712953958468
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: "Mon nom en invers\xE9 c'est cul."
     - rid: 3768623712953958469
       type: {class: ChoiceNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -116,14 +112,6 @@ MonoBehaviour:
           m_PortDirection: 1
           m_PortOrientation: 0
           m_Title: in
-    - rid: 3768623712953958471
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Choix 1
-    - rid: 3768623712953958472
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Choix 2
     - rid: 3768623712953958473
       type: {class: UserNodeModelImp, ns: Unity.GraphToolkit.Editor.Implementation, asm: Unity.GraphToolkit.Editor}
       data:
@@ -143,14 +131,14 @@ MonoBehaviour:
         m_InputConstantsById:
           m_KeyList:
           - Speaker
-          - Dialogue
           - Humeur
           - SpeakerKey
+          - DialogueKey
           m_ValueList:
           - rid: 3768623712953958475
-          - rid: 3768623712953958476
           - rid: 3768623719143178314
           - rid: 3768623719143178351
+          - rid: 6020289403143323750
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -202,10 +190,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Moi
-    - rid: 3768623712953958476
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Je suis le choix 1
     - rid: 3768623712953958477
       type: {class: DialogueNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -228,14 +212,14 @@ MonoBehaviour:
         m_InputConstantsById:
           m_KeyList:
           - Speaker
-          - Dialogue
           - Humeur
           - SpeakerKey
+          - DialogueKey
           m_ValueList:
           - rid: 3768623712953958482
-          - rid: 3768623712953958483
           - rid: 3768623719143178315
           - rid: 3768623719143178352
+          - rid: 6020289403143323751
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -255,10 +239,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Moi
-    - rid: 3768623712953958483
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Je suis le choix 2
     - rid: 3768623712953958484
       type: {class: DialogueNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -294,10 +274,6 @@ MonoBehaviour:
           m_PortDirection: 1
           m_PortOrientation: 0
           m_Title: in
-    - rid: 3768623712953958486
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Choix 3
     - rid: 3768623712953958487
       type: {class: UserNodeModelImp, ns: Unity.GraphToolkit.Editor.Implementation, asm: Unity.GraphToolkit.Editor}
       data:
@@ -317,14 +293,14 @@ MonoBehaviour:
         m_InputConstantsById:
           m_KeyList:
           - Speaker
-          - Dialogue
           - Humeur
           - SpeakerKey
+          - DialogueKey
           m_ValueList:
           - rid: 3768623712953958489
-          - rid: 3768623712953958490
           - rid: 3768623719143178316
           - rid: 3768623719143178353
+          - rid: 6020289403143323752
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -376,10 +352,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Moi
-    - rid: 3768623712953958490
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: Je suis le choix 3
     - rid: 3768623712953958491
       type: {class: DialogueNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -439,14 +411,14 @@ MonoBehaviour:
         m_InputConstantsById:
           m_KeyList:
           - Speaker
-          - Dialogue
           - Humeur
           - SpeakerKey
+          - DialogueKey
           m_ValueList:
           - rid: 3768623712953958501
-          - rid: 3768623712953958502
           - rid: 3768623719143178317
           - rid: 3768623719143178354
+          - rid: 6020289403143323753
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -466,10 +438,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Truc
-    - rid: 3768623712953958502
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: I'm truc.
     - rid: 3768623712953958503
       type: {class: DialogueNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -1784,14 +1752,14 @@ MonoBehaviour:
         m_InputConstantsById:
           m_KeyList:
           - Speaker
-          - Dialogue
           - Humeur
           - SpeakerKey
+          - DialogueKey
           m_ValueList:
           - rid: 6020289383075938534
-          - rid: 6020289383075938535
           - rid: 3768623719143178313
           - rid: 3768623719143178350
+          - rid: 6020289403143323748
         m_InputPortInfos:
           expandedPortsById:
             m_KeyList: []
@@ -1811,10 +1779,6 @@ MonoBehaviour:
       type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
       data:
         m_Value: Jerome
-    - rid: 6020289383075938535
-      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
-      data:
-        m_Value: I am your father
     - rid: 6020289383075938536
       type: {class: DialogueNode, ns: , asm: Assembly-CSharp-Editor}
       data: 
@@ -1850,3 +1814,39 @@ MonoBehaviour:
           m_PortDirection: 1
           m_PortOrientation: 0
           m_Title: in
+    - rid: 6020289403143323748
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323749
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323750
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323751
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323752
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323753
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323789
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323790
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 
+    - rid: 6020289403143323791
+      type: {class: 'Constant`1[[System.String, mscorlib]]', ns: Unity.GraphToolkit.Editor, asm: Unity.GraphToolkit.Internal.Editor}
+      data:
+        m_Value: 

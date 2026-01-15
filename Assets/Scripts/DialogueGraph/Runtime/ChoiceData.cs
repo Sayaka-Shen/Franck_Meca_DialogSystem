@@ -4,6 +4,6 @@ using System;
 [Serializable]
 public class ChoiceData
 {
-    public string ChoiceText;
+    public string ChoiceKey;
     public string DesinationNodeID;
 }

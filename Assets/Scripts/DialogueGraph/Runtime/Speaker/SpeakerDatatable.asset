@@ -36,4 +36,7 @@ MonoBehaviour:
     Key: SPK_EP
     Sprite: {fileID: 2800000, guid: 4d04585ccf1a26845a8253eb3c4af372, type: 3}
     AudioClip: {fileID: 8300000, guid: fdb3c6b44f1b9894189831bcf738011f, type: 3}
-    Humeurs: []
+    Humeurs:
+    - Label: Happy
+      Humeur: 1
+      Text2D: {fileID: 2800000, guid: ada27eb1719a99541b3cf1e770c625e5, type: 3}

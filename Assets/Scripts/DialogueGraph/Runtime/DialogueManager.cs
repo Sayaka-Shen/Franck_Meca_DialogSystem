@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using DialogueGraph.Shared;
 using TMPro;
 using Unity.GraphToolkit.Editor;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -11,6 +12,11 @@ using UnityEngine.UI;
 public class DialogueManager : MonoBehaviour
 {
     public RuntimeDialogueGraph RuntimeGraph;
+
+    [Header("Dialogue")] 
+    [SerializeField] private LANGUAGE m_currentLanguage;
+    [SerializeField] private TextAsset m_dialogueData;
+    private DialogueTable m_dialogueTable = new DialogueTable();
 
     [Header("UI Components")] 
     public GameObject DialoguePanel;
@@ -34,6 +40,11 @@ public class DialogueManager : MonoBehaviour
 
     private void Start()
     {
+        // Init Dialogue Table
+        m_dialogueTable.Load(m_dialogueData);
+
+        Debug.Log(m_dialogueTable.IsLoaded());
+        
         // TO EDIT
         // audio
         audioSource = GetComponent<AudioSource>();
@@ -85,12 +96,14 @@ public class DialogueManager : MonoBehaviour
             Debug.LogError($"Key Speaker {_currentNode.SpeakerKey} doesn't exist.");
 
         // -- dialogue --
+        DialogueTable.Row dialogueRow = m_dialogueTable.Find_Key(_currentNode.DialogueKey);
 
         DialoguePanel.SetActive(true);
         SpeakerNameText.SetText(currentSpeaker.Name);
-        DialogueText.SetText(_currentNode.DialogueText);
+        DialogueText.SetText(GetLocalizedText(dialogueRow));
            
         // -- choices --
+        
         foreach (Transform child in ChoiceButtonContainer)
         {
             Destroy(child.gameObject);
@@ -105,7 +118,7 @@ public class DialogueManager : MonoBehaviour
                 TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
                 if (buttonText != null)
                 {
-                    buttonText.text = choice.ChoiceText;
+                    buttonText.text = GetLocalizedText(m_dialogueTable.Find_Key(choice.ChoiceKey));
                 }
 
                 if(button != null)
@@ -141,5 +154,20 @@ public class DialogueManager : MonoBehaviour
     {
         DialoguePanel.SetActive(false); 
         _currentNode = null;
+    }
+
+    private string GetLocalizedText(DialogueTable.Row row)
+    {
+        switch (m_currentLanguage)
+        {
+            case LANGUAGE.Français:
+                return row.FR;
+            case LANGUAGE.Anglais:
+                return row.AN;
+            case LANGUAGE.Espagnol:
+                return row.ES;
+            default:
+                return row.FR;
+        }
     }
 }
