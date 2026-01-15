@@ -10,7 +10,7 @@ public class SpeakerData
     [Delayed]
     public string Name;
 
-    [Delayed]
+    [ReadOnly,Delayed]
     public string Key;
 
     public Texture2D Sprite;
