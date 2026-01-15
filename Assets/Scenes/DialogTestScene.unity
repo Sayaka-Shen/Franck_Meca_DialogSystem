@@ -1012,7 +1012,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
   RuntimeGraph: {fileID: 3965311268370046156, guid: e02cec79f47d7cc48847cceb7a7aacce, type: 3}
-  m_dialogueCurrentLanguage: 0
+  m_currentLanguage: 0
   m_dialogueData: {fileID: 4900000, guid: b7df2078bcffdca4886d6cfeb79e3712, type: 3}
   DialoguePanel: {fileID: 1434670040}
   SpeakerNameText: {fileID: 2141467007}
