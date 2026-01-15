@@ -9,4 +9,11 @@ namespace DialogueGraph.Shared
         Angry,
         Sad
     }
+
+    public enum LANGUAGE
+    {
+        Français,
+        Anglais, 
+        Espagnol
+    }
 }

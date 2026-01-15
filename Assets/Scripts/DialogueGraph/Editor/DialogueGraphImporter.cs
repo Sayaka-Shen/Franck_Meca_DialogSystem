@@ -45,7 +45,7 @@ public class DialogueGraphImporter : ScriptedImporter
                 ProcessChoiceNode(choiceNode, runtimeNode, nodeIdMap);
             }
 
-                runtimeGraph.AllNodes.Add(runtimeNode);
+            runtimeGraph.AllNodes.Add(runtimeNode);
         }
         
         ctx.AddObjectToAsset("RuntimeData", runtimeGraph);
@@ -57,7 +57,7 @@ public class DialogueGraphImporter : ScriptedImporter
         Dictionary<INode, string> nodeIdMap)
     {
         runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
-        runtimeNode.DialogueText = GetPortValue<string>(node.GetInputPortByName("Dialogue"));
+        runtimeNode.DialogueKey = GetPortValue<string>(node.GetInputPortByName("DialogueKey"));
 
         // Speaker
         runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
@@ -79,7 +79,7 @@ public class DialogueGraphImporter : ScriptedImporter
     {
         // dialogue 
         runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
-        runtimeNode.DialogueText = GetPortValue<string>(node.GetInputPortByName("Dialogue"));
+        runtimeNode.DialogueKey = GetPortValue<string>(node.GetInputPortByName("DialogueKey"));
 
         //speaker
         runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
@@ -91,11 +91,11 @@ public class DialogueGraphImporter : ScriptedImporter
         foreach(var outputPort in choiceOutputPorts)
         {
             var index = outputPort.name.Substring("Choice ".Length);
-            var textPort = node.GetInputPortByName($"Choice Text {index}");
+            var textPort = node.GetInputPortByName($"ChoiceKey {index}");
 
             var choiceData = new ChoiceData
             {
-                ChoiceText = GetPortValue<string>(textPort),
+                ChoiceKey = GetPortValue<string>(textPort),
                 DesinationNodeID = outputPort.firstConnectedPort != null ? nodeIdMap[outputPort.firstConnectedPort.GetNode()] : null
             };
 

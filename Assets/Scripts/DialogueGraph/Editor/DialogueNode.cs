@@ -12,7 +12,7 @@ public class DialogueNode : Node
         context.AddOutputPort("out").Build();
         
         context.AddInputPort<string>("Speaker").Build();
-        context.AddInputPort<string>("Dialogue").Build();
+        context.AddInputPort<string>("DialogueKey").Build();
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();

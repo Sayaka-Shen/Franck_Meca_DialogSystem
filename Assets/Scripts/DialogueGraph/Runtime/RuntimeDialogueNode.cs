@@ -10,7 +10,7 @@ public class RuntimeDialogueNode
     public string NodeId;
     public string SpeakerName;
 
-    public string DialogueText;
+    public string DialogueKey;
     public string NextNodeId;
 
     // Choices

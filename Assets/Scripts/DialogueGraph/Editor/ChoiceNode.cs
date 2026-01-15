@@ -13,7 +13,7 @@ public class ChoiceNode : Node
         context.AddInputPort("in").Build();
         
         context.AddInputPort<string>("Speaker").Build();
-        context.AddInputPort<string>("Dialogue").Build();
+        context.AddInputPort<string>("DialogueKey").Build();
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();
@@ -23,7 +23,7 @@ public class ChoiceNode : Node
         option.TryGetValue(out int portCount);
         for (int i = 0; i < portCount; i++)
         {
-            context.AddInputPort<string>($"Choice Text {i}").Build();
+            context.AddInputPort<string>($"ChoiceKey {i}").Build();
             context.AddOutputPort($"Choice {i}").Build();
         }
     }
