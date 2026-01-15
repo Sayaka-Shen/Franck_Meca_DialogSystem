@@ -29,7 +29,7 @@ MonoBehaviour:
           serializedVersion: 2
           Hash: 4ae097b261fe915823fd6ab9cfeac5b4
         m_Version: 2
-        m_Position: {x: 894.0919, y: 171.18964}
+        m_Position: {x: 904.6719, y: 172.24762}
         m_Title: 
         m_Tooltip: 
         m_NodePreviewModel:
@@ -826,7 +826,7 @@ MonoBehaviour:
           serializedVersion: 2
           Hash: 8a791b8b0d5d147d32bfbcb41c5de17d
         m_Version: 2
-        m_Position: {x: 682.39996, y: 372.8}
+        m_Position: {x: 682.39996, y: 393.60004}
         m_Title: Angry
         m_Tooltip: 
         m_NodePreviewModel:
@@ -1211,7 +1211,7 @@ MonoBehaviour:
           serializedVersion: 2
           Hash: af62141253d5d490d7faeabdf32578a0
         m_Version: 2
-        m_Position: {x: 961.2538, y: 460.33844}
+        m_Position: {x: 987.65375, y: 463.53845}
         m_Title: Happy
         m_Tooltip: 
         m_NodePreviewModel:
@@ -1400,7 +1400,7 @@ MonoBehaviour:
           serializedVersion: 2
           x: 408.80002
           y: 9.599998
-          width: 1511.2
+          width: 1638.3999
           height: 651.2
         m_GraphElementMetaData:
         - m_Guid:
@@ -1775,7 +1775,7 @@ MonoBehaviour:
           serializedVersion: 2
           Hash: ec44f713dd6424d6d3eba0d4bc43c415
         m_Version: 2
-        m_Position: {x: 622.9765, y: 208.96674}
+        m_Position: {x: 622.1766, y: 208.96674}
         m_Title: 
         m_Tooltip: 
         m_NodePreviewModel:
