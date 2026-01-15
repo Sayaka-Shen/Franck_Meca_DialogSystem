@@ -32,20 +32,34 @@ public class OrbitCamera : MonoBehaviour
     [SerializeField] private float angleA = 0f;
     [Tooltip("Angle B in degrees")]
     [SerializeField] private float angleB = 90f;
+    private float currentRollZ;
 
     [SerializeField] private bool bZoomDuringTurn = true;
     [Tooltip("Zoom strength")]
     [SerializeField] private float zoomInAmount = 3f;
-    [SerializeField] private AnimationCurve zoomCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 0f);
-
+    [SerializeField] private AnimationCurve turnSpeedCurve = AnimationCurve.EaseInOut(0f, 0.2f, 1f, 0.2f);
+    [SerializeField] private int curveSamples = 80;
     private float runtimeDistance;
 
     public enum AxisIndex { X = 0, Y = 1, Z = 2 }
     [Header("Rotation Axis (choose one)")]
-    [SerializeField, HideInInspector] private int rotationAxisIndex = 1; // 0=X,1=Y,2=Z
+    [SerializeField, HideInInspector] private int rotationAxisIndex = 1; // 0=X, 1=Y, 2=Z
 
-    public enum TurnMode { Snap = 0, Circle = 1 }
+    public enum TurnMode
+    {
+        SnapToggle = 0,     // A to B instantly
+        CircleToggle = 1,   // A to B smoothly
+        PingPong = 2,       // A to B to A in one press
+        Loop360 = 3,        // 360 no scope
+        Continuous = 4      // increment by degree per input
+    }
+
     [SerializeField, HideInInspector] private int turnModeIndex = 1; // 0=Snap, 1=Circle
+
+    [Header("Continuous Mode")]
+    [SerializeField] private float stepAngle = 90f;
+    [SerializeField] private bool useOppositeKey = true;
+    [SerializeField] private KeyCode oppositeKey = KeyCode.Q;
 
 
     private float currentAngle;
@@ -75,38 +89,85 @@ public class OrbitCamera : MonoBehaviour
 
         cam.localPosition = new Vector3(0f, height, -runtimeDistance);
 
-        cam.LookAt(target.transform.position + Vector3.up * lookAtHeight, Vector3.up);
+        Vector3 lookTarget = target.transform.position + Vector3.up * lookAtHeight;
 
-        if (!IsTurning && Input.GetKeyDown(toggleKey))
+        Quaternion lookRot = Quaternion.LookRotation(lookTarget - cam.position, Vector3.up);
+
+        if (rotationAxisIndex == 2)
+            lookRot *= Quaternion.Euler(0f, 0f, currentRollZ);
+
+        cam.rotation = lookRot;
+
+        if (IsTurning) return;
+
+        if ((TurnMode)turnModeIndex == TurnMode.Continuous)
         {
-            float next = atB ? angleA : angleB;
-            atB = !atB;
+            if (Input.GetKeyDown(toggleKey))
+                StartCoroutine(TurnByDelta(+stepAngle));
 
-            if (turnModeIndex == (int)TurnMode.Snap)
-            {
-                //oh snap
-                currentAngle = next;
-                ApplyPose(currentAngle);
-                FacePlayerTowardCamera();
-            }
-            else
-            {
-                //smoov off
-                StartCoroutine(TurnTo(next));
-            }
+            if (useOppositeKey && Input.GetKeyDown(oppositeKey))
+                StartCoroutine(TurnByDelta(-stepAngle));
+
+            return;
         }
 
+        if (!Input.GetKeyDown(toggleKey)) return;
+
+        switch ((TurnMode)turnModeIndex)
+        {
+            case TurnMode.SnapToggle:
+                {
+                    float next = atB ? angleA : angleB;
+                    atB = !atB;
+                    currentAngle = next;
+                    ApplyPose(currentAngle);
+                    FacePlayerTowardCamera();
+                    break;
+                }
+
+            case TurnMode.CircleToggle:
+                {
+                    float next = atB ? angleA : angleB;
+                    atB = !atB;
+                    StartCoroutine(TurnTo(next));
+                    break;
+                }
+
+            case TurnMode.PingPong:
+                {
+                    StartCoroutine(PingPongTurn());
+                    break;
+                }
+
+            case TurnMode.Loop360:
+                {
+                    StartCoroutine(TurnByDelta(+360f));
+                    break;
+                }
+        }
     }
 
     void ApplyPose(float angle)
     {
+        if (rotationAxisIndex == 2)
+        {
+            currentRollZ = angle;
+            transform.rotation = Quaternion.identity;
+            return;
+        }
+
+        currentRollZ = 0f;
+
         float x = (rotationAxisIndex == 0) ? angle : 0f;
         float y = (rotationAxisIndex == 1) ? angle : 0f;
-        float z = (rotationAxisIndex == 2) ? angle : 0f;
 
-        transform.rotation = Quaternion.Euler(x, y, z);
+        transform.rotation = Quaternion.Euler(x, y, 0f);
     }
 
+
+    #region --- COROUTINES ---
+
+    // --- BASE TURN TO FUNCTION ---
     IEnumerator TurnTo(float targetAngle)
     {
         IsTurning = true;
@@ -117,37 +178,22 @@ public class OrbitCamera : MonoBehaviour
         float startAngle = currentAngle;
         float t = 0f;
 
-        while (t < 1f)
+        float duration = Mathf.Max(0.0001f, turnDuration);
+        float elapsed = 0f;
+
+        float totalArea = TotalCurveArea01(turnSpeedCurve, curveSamples);
+
+        while (elapsed < duration)
         {
-            t += Time.unscaledDeltaTime / Mathf.Max(0.0001f, turnDuration);
-            currentAngle = Mathf.LerpAngle(startAngle, targetAngle, t);
+            elapsed += Time.unscaledDeltaTime;
+            float nt = Mathf.Clamp01(elapsed / duration);
+
+            float mapped = EvaluateIntegrated01(turnSpeedCurve, nt, curveSamples) / totalArea;
+
+            currentAngle = Mathf.LerpAngle(startAngle, targetAngle, mapped);
             ApplyPose(currentAngle);
 
-            while (t < 1f)
-            {
-                t += Time.unscaledDeltaTime / Mathf.Max(0.0001f, turnDuration);
-                float nt = Mathf.Clamp01(t);
-
-                currentAngle = Mathf.LerpAngle(startAngle, targetAngle, nt);
-                ApplyPose(currentAngle);
-
-                //zoom effect
-                if (bZoomDuringTurn)
-                {
-                    float peak = Mathf.Sin(nt * Mathf.PI);
-                    float shaped = zoomCurve.Evaluate(nt);
-                    float zoomFactor = Mathf.Max(peak, shaped);
-
-                    runtimeDistance = distance - zoomInAmount * zoomFactor;
-                }
-
-                FacePlayerTowardCamera();
-                yield return null;
-            }
-
-
             FacePlayerTowardCamera();
-
             yield return null;
         }
 
@@ -164,6 +210,55 @@ public class OrbitCamera : MonoBehaviour
         IsTurning = false;
     }
 
+    // --- PING PONG ---
+    private IEnumerator PingPongTurn()
+    {
+        float first = atB ? angleA : angleB;
+        float second = atB ? angleB : angleA;
+
+        yield return TurnTo(first);
+        atB = !atB;
+
+        yield return TurnTo(second);
+        atB = !atB;
+    }
+
+    // --- TURN BY DELTA --- (360 full rota + continuous for steps)
+    private IEnumerator TurnByDelta(float deltaAngle)
+    {
+        IsTurning = true;
+        FreezeScene();
+
+        yield return new WaitForSecondsRealtime(freezeRotationDelay);
+
+        float startAngle = currentAngle;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.unscaledDeltaTime / Mathf.Max(0.0001f, turnDuration);
+            float nt = Mathf.Clamp01(t);
+
+            currentAngle = startAngle + deltaAngle * nt;
+            ApplyPose(currentAngle);
+
+            FacePlayerTowardCamera();
+            yield return null;
+        }
+
+        currentAngle = startAngle + deltaAngle;
+        ApplyPose(currentAngle);
+        FacePlayerTowardCamera();
+
+        yield return new WaitForSecondsRealtime(freezeRotationDelay);
+
+        UnfreezeScene();
+        IsTurning = false;
+    }
+
+
+    #endregion
+
     // --- ROTATE PLAYER ---
 
     private void FacePlayerTowardCamera()
@@ -177,6 +272,8 @@ public class OrbitCamera : MonoBehaviour
 
 
     // --- FREEZE SCENE ---
+
+    #region --- FREEZE SCENE ---
     private void FreezeScene()
     {
         if (bSetFreezeActive)
@@ -198,4 +295,38 @@ public class OrbitCamera : MonoBehaviour
             Time.fixedDeltaTime = _prevFixedDeltaTime;
         }
     }
+    #endregion
+
+
+    // --- HELPERS ---
+
+    #region --- HELPERS ---
+
+    private float EvaluateIntegrated01(AnimationCurve curve, float t01, int samples)
+    {
+        t01 = Mathf.Clamp01(t01);
+        samples = Mathf.Max(4, samples);
+
+        float area = 0f;
+        float prevT = 0f;
+        float prevV = Mathf.Max(0f, curve.Evaluate(0f));
+
+        for (int i = 1; i <= samples; i++)
+        {
+            float t = (t01 * i) / samples;
+            float v = Mathf.Max(0f, curve.Evaluate(t));
+            area += (prevV + v) * 0.5f * (t - prevT);
+            prevT = t;
+            prevV = v;
+        }
+
+        return area;
+    }
+
+    private float TotalCurveArea01(AnimationCurve curve, int samples)
+    {
+        return Mathf.Max(0.0001f, EvaluateIntegrated01(curve, 1f, samples));
+    }
+
+    #endregion
 }

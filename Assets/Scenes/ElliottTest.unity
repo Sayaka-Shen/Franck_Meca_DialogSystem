@@ -158,12 +158,12 @@ MonoBehaviour:
   bSetFreezeActive: 1
   freezeRotationDelay: 0.2
   toggleKey: 101
-  turnDuration: 0.25
+  turnDuration: 0.2
   angleA: 0
   angleB: 90
   bZoomDuringTurn: 1
-  zoomInAmount: 1.5
-  zoomCurve:
+  zoomInAmount: 2
+  turnSpeedCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -176,14 +176,14 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.48333332
-      value: 0.013809524
-      inSlope: 0
-      outSlope: 0
+      time: 0.5
+      value: 1
+      inSlope: -0.0011453634
+      outSlope: -0.0011453634
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.6099081
     - serializedVersion: 3
       time: 1
       value: 0
@@ -196,8 +196,12 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  curveSamples: 80
   rotationAxisIndex: 1
-  turnModeIndex: 1
+  turnModeIndex: 4
+  stepAngle: 90
+  useOppositeKey: 1
+  oppositeKey: 113
 --- !u!4 &210294570
 Transform:
   m_ObjectHideFlags: 0
