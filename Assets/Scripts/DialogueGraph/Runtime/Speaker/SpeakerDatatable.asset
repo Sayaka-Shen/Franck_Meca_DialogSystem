@@ -31,7 +31,16 @@ MonoBehaviour:
     Key: SPK_LM
     Sprite: {fileID: 2800000, guid: 652e5791f9ce3c443a4a7cfd15677f85, type: 3}
     AudioClip: {fileID: 8300000, guid: 522cf4025fb54c645bfb83b1e79dc20c, type: 3}
-    Humeurs: []
+    Humeurs:
+    - Label: Happy
+      Humeur: 1
+      Text2D: {fileID: 2800000, guid: 7d7b05579a94b9c46afd65a7a0f3a95a, type: 3}
+    - Label: Angry
+      Humeur: 2
+      Text2D: {fileID: 2800000, guid: 7ade9e175335ab144ab0ced8197c3fc2, type: 3}
+    - Label: Sad
+      Humeur: 3
+      Text2D: {fileID: 2800000, guid: 79cc56208c147fc45a51076c5e85e7fd, type: 3}
   - Name: Ellie Prout
     Key: SPK_EP
     Sprite: {fileID: 2800000, guid: 4d04585ccf1a26845a8253eb3c4af372, type: 3}
@@ -39,4 +48,10 @@ MonoBehaviour:
     Humeurs:
     - Label: Happy
       Humeur: 1
-      Text2D: {fileID: 2800000, guid: ada27eb1719a99541b3cf1e770c625e5, type: 3}
+      Text2D: {fileID: 2800000, guid: 83cae83d9fb00eb43ae3729cf68f776e, type: 3}
+    - Label: Angry
+      Humeur: 2
+      Text2D: {fileID: 2800000, guid: 6dfecef9606ac7e4dba22d9d6a1e63a4, type: 3}
+    - Label: Sad
+      Humeur: 3
+      Text2D: {fileID: 2800000, guid: 6f71603189cdc32419a337657f0c64fa, type: 3}
