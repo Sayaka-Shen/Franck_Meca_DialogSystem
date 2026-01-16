@@ -1011,7 +1011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca05bb02cf4b1843ad173540e0eee80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
-  RuntimeGraph: {fileID: 3965311268370046156, guid: e02cec79f47d7cc48847cceb7a7aacce, type: 3}
+  RuntimeGraph: {fileID: 3965311268370046156, guid: 0a67558f4651c6e49a7dbee983598168, type: 3}
   m_currentLanguage: 0
   m_dialogueData: {fileID: 4900000, guid: b7df2078bcffdca4886d6cfeb79e3712, type: 3}
   DialoguePanel: {fileID: 1434670040}

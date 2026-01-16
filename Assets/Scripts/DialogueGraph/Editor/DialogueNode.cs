@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
-using Unity.GraphToolkit.Editor;
 using DialogueGraph.Shared;
-using Unity.VisualScripting;
+using Unity.GraphToolkit.Editor;
+using UnityEditor;
 using UnityEngine;
 
 [Serializable]
@@ -14,8 +13,7 @@ public class DialogueNode : Node
         context.AddOutputPort("out").Build();
         
         context.AddInputPort<string>("Speaker").Build();
-        context.AddInputPort<string>("DialogueKey").Build();
-        
+        context.AddInputPort<DialogueKey>("DialogueKey").Build();
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();

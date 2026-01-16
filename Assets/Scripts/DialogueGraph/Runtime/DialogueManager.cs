@@ -42,8 +42,6 @@ public class DialogueManager : MonoBehaviour
     {
         // Init Dialogue Table
         m_dialogueTable.Load(m_dialogueData);
-
-        Debug.Log(m_dialogueTable.IsLoaded());
         
         // TO EDIT
         // audio
@@ -96,8 +94,8 @@ public class DialogueManager : MonoBehaviour
             Debug.LogError($"Key Speaker {_currentNode.SpeakerKey} doesn't exist.");
 
         // -- dialogue --
-        DialogueTable.Row dialogueRow = m_dialogueTable.Find_Key(_currentNode.DialogueKey);
-
+        DialogueTable.Row dialogueRow = m_dialogueTable.Find_Key(_currentNode.DialogueKey.ToKey());
+        
         DialoguePanel.SetActive(true);
         SpeakerNameText.SetText(currentSpeaker.Name);
         DialogueText.SetText(GetLocalizedText(dialogueRow));
@@ -118,7 +116,7 @@ public class DialogueManager : MonoBehaviour
                 TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
                 if (buttonText != null)
                 {
-                    buttonText.text = GetLocalizedText(m_dialogueTable.Find_Key(choice.ChoiceKey));
+                    buttonText.text = GetLocalizedText(m_dialogueTable.Find_Key(choice.ChoiceKey.ToKey()));
                 }
 
                 if(button != null)

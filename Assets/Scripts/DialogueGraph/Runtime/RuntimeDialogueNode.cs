@@ -9,8 +9,8 @@ public class RuntimeDialogueNode
     // Dialogue
     public string NodeId;
     public string SpeakerName;
-
-    public string DialogueKey;
+    
+    public DialogueKey DialogueKey;
     public string NextNodeId;
 
     // Choices
