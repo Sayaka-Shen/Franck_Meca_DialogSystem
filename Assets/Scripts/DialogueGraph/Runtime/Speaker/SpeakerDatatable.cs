@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using DialogueGraph.Shared;
 using NUnit.Framework;
 using UnityEngine;
-using static SpeakerData;
 
 [CreateAssetMenu(fileName = "SpeakerDatatable", menuName = "Scriptable Objects/SpeakerDatatable")]
 public class SpeakerDatatable : ScriptableObject
@@ -31,8 +30,6 @@ public class SpeakerDatatable : ScriptableObject
         {
             data.UpdateDebugInfo();
         }
-
-        //Debug.Log("On validate");
     }
 }
 

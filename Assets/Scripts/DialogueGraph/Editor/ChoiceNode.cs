@@ -11,9 +11,8 @@ public class ChoiceNode : Node
     protected override void OnDefinePorts(IPortDefinitionContext context)
     {
         context.AddInputPort("in").Build();
-        
-        context.AddInputPort<string>("Speaker").Build();
-        context.AddInputPort<string>("DialogueKey").Build();
+    
+        context.AddInputPort<DialogueKey>("DialogueKey").Build();
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();
@@ -23,14 +22,14 @@ public class ChoiceNode : Node
         option.TryGetValue(out int portCount);
         for (int i = 0; i < portCount; i++)
         {
-            context.AddInputPort<string>($"ChoiceKey {i}").Build();
+            context.AddInputPort<DialogueKey>($"ChoiceKey {i}").Build();
             context.AddOutputPort($"Choice {i}").Build();
         }
     }
 
+
     protected override void OnDefineOptions(IOptionDefinitionContext context)
     {
         context.AddOption<int>(optionID).Delayed().WithDefaultValue(2);
-        //, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() }
     }
 }

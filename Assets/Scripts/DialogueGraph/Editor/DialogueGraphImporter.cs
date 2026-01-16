@@ -1,127 +1,369 @@
+﻿using UnityEditor.AssetImporters;
 using UnityEngine;
-using UnityEditor.AssetImporters;
 using Unity.GraphToolkit.Editor;
 using System;
 using System.Collections.Generic;
-using DialogueGraph.Shared;
 using System.Linq;
+using DialogueGraph.Shared;
 using Unity.GraphToolkit;
+using UnityEditor;
+using NUnit.Framework.Internal;
 
 [ScriptedImporter(1, DialogueGraphClass.AssetExtension)]
 public class DialogueGraphImporter : ScriptedImporter
 {
+
+#if UNITY_EDITOR
+    private ConditionRegistry conditionRegistry;
+#endif
+
     public override void OnImportAsset(AssetImportContext ctx)
     {
         DialogueGraphClass editorGraph = GraphDatabase.LoadGraphForImporter<DialogueGraphClass>(ctx.assetPath);
         RuntimeDialogueGraph runtimeGraph = ScriptableObject.CreateInstance<RuntimeDialogueGraph>();
-        Dictionary<INode, string> nodeIdMap = new Dictionary<INode, string>();
 
-        foreach (INode node in editorGraph.GetNodes())
-        {
-            nodeIdMap[node] = Guid.NewGuid().ToString();
-        }
+        Dictionary<INode, string> nodeIdMap = new();
 
-        INode startNode = editorGraph.GetNodes().OfType<INode>().FirstOrDefault();
-        if (startNode != null)
-        {
-            IPort entryPort = startNode.GetOutputPorts().FirstOrDefault()?.firstConnectedPort;
-            if (entryPort != null)
-            {
-                runtimeGraph.EntryNodeId = nodeIdMap[entryPort.GetNode()];
-            }
-        }
+        // --- DEBUG ---
+        bool hasErrors = false;
+        int nodeIndex = 1;
         
         foreach (INode node in editorGraph.GetNodes())
         {
-            if (node is DialogueStartNode || node is DialogueEndNode) continue;
-            
-            RuntimeDialogueNode runtimeNode = new RuntimeDialogueNode{ NodeId = nodeIdMap[node] };
+            // TO EDIT à voir si on peut pas le combiner en ValidateRuntimeNode()
             if (node is DialogueNode dialogueNode)
             {
-                ProcessDialogueNode(dialogueNode, runtimeNode, nodeIdMap);
+                hasErrors |= ValidateDialogueNode(dialogueNode, nodeIndex);
+                nodeIndex++;
             }
             else if (node is ChoiceNode choiceNode)
             {
-                ProcessChoiceNode(choiceNode, runtimeNode, nodeIdMap);
+                hasErrors |= ValidateChoiceNode(choiceNode, nodeIndex);
+                nodeIndex++;
             }
-
-            runtimeGraph.AllNodes.Add(runtimeNode);
+            // validate if node
         }
         
+        if (hasErrors)
+        {
+            Debug.LogWarning($"<color=orange><b>Le graph contient des erreurs de validation!</b></color>");
+        }
+        else
+        {
+            Debug.Log($"<color=green><b>Tous les nodes sont valides!</b></color>");
+        }
+        
+
+        //  Génère TOUS les IDs
+        foreach (var node in editorGraph.GetNodes())
+            nodeIdMap[node] = Guid.NewGuid().ToString();
+
+        // Start Node
+        var startNode = editorGraph.GetNodes().OfType<DialogueStartNode>().FirstOrDefault();
+        if (startNode == null)
+        {
+            Debug.LogError("No DialogueStartNode");
+            return;
+        }
+
+        var startOut = startNode.GetOutputPorts().FirstOrDefault()?.firstConnectedPort;
+        if (startOut == null)
+        {
+            Debug.LogError("StartNode has no connection");
+            return;
+        }
+
+        runtimeGraph.EntryNodeId = nodeIdMap[startOut.GetNode()];
+
+        //// --- PROCESS ---
+        foreach (var node in editorGraph.GetNodes())
+        {
+            RuntimeNode runtimeNode = null;
+
+            if (node is DialogueStartNode)
+            {
+                runtimeNode = new RuntimeNode();
+            }
+            else if (node is DialogueEndNode)
+            {
+                runtimeNode = new RuntimeEndNode();
+            }
+            else if (node is IF ifNode)
+            {
+                var rIf = new RuntimeIFNode();
+                ProcessIfNode(ifNode, rIf, nodeIdMap);
+                runtimeNode = rIf;
+            }
+            else if (node is DialogueNode dNode)
+            {
+                var r = new RuntimeDialogueNode();
+                ProcessDialogueNode(dNode, r, nodeIdMap);
+                runtimeNode = r;
+            }
+            else if (node is ChoiceNode cNode)
+            {
+                var r = new RuntimeDialogueNode();
+                ProcessChoiceNode(cNode, r, nodeIdMap);
+                runtimeNode = r;
+            }
+
+            if (runtimeNode != null)
+            {
+                runtimeNode.NodeId = nodeIdMap[node];
+                runtimeGraph.AllNodes.Add(runtimeNode);
+            }
+        }
+
+
+        // --- DEBUG ---
+
+        //foreach (var node in runtimeGraph.AllNodes)
+        //{
+        //    if (node is RuntimeDialogueNode d &&
+        //        !string.IsNullOrEmpty(d.NextNodeId) &&
+        //        !runtimeGraph.AllNodes.Any(n => n.NodeId == d.NextNodeId))
+        //    {
+        //        Debug.LogError($"Broken link {node.NodeId} → {d.NextNodeId}");
+        //    }
+
+        //    if (node is RuntimeIFNode i)
+        //    {
+        //        if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.TrueNodeId))
+        //            Debug.LogError($"IF TRUE broken: {i.TrueNodeId}");
+
+        //        if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.FalseNodeId))
+        //            Debug.LogError($"IF FALSE broken: {i.FalseNodeId}");
+        //    }
+        //}
+
         ctx.AddObjectToAsset("RuntimeData", runtimeGraph);
         ctx.SetMainObject(runtimeGraph);
-        
     }
 
-    private void ProcessDialogueNode(DialogueNode node, RuntimeDialogueNode runtimeNode,
-        Dictionary<INode, string> nodeIdMap)
+    // --- DIALOGUE Node ---
+    void ProcessDialogueNode(DialogueNode node, RuntimeDialogueNode r,
+        Dictionary<INode, string> map)
     {
-        runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
-        runtimeNode.DialogueKey = GetPortValue<string>(node.GetInputPortByName("DialogueKey"));
+        r.DialogueKey = GetPortValue<DialogueKey>(node.GetInputPortByName("DialogueKey"));
+        r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
+        r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
 
-        // Speaker
-        runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
-        // when save if key doesn't exit print error
+        //var port = node.GetInputPortByName("Humeur");
+        //Debug.Log($"Humeur connected: {port.firstConnectedPort != null}");
 
-        runtimeNode.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
+        //var sourcePort = port.firstConnectedPort;
+        //object test = sourcePort.;
+        //if(sourcePort.TryGetValue(out var sourceVal)) Debug.Log(sourceVal);
 
-        IPort nextNodePort = node.GetOutputPortByName("out")?.firstConnectedPort;
-        if (nextNodePort != null)
-        {
-            runtimeNode.NextNodeId = nodeIdMap[nextNodePort.GetNode()];
-        }
-
-
+        var outPort = node.GetOutputPortByName("out")?.firstConnectedPort;
+        if (outPort != null)
+            r.NextNodeId = map[outPort.GetNode()];
     }
 
-    private void ProcessChoiceNode(ChoiceNode node, RuntimeDialogueNode runtimeNode,
-        Dictionary<INode, string> nodeIdMap)
+    // --- CHOICE Node ---
+    void ProcessChoiceNode(ChoiceNode node, RuntimeDialogueNode r,
+        Dictionary<INode, string> map)
     {
-        // dialogue 
-        runtimeNode.SpeakerName = GetPortValue<string>(node.GetInputPortByName("Speaker"));
-        runtimeNode.DialogueKey = GetPortValue<string>(node.GetInputPortByName("DialogueKey"));
+        r.DialogueKey = GetPortValue<DialogueKey>(node.GetInputPortByName("DialogueKey"));
+        r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
+        r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
 
-        //speaker
-        runtimeNode.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
-        runtimeNode.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
-
-        // choice
-        var choiceOutputPorts = node.GetOutputPorts().Where(p => p.name.StartsWith("Choice "));
-
-        foreach(var outputPort in choiceOutputPorts)
+        foreach (var outputPort in node.GetOutputPorts().Where(p => p.name.StartsWith("Choice ")))
         {
-            var index = outputPort.name.Substring("Choice ".Length);
-            var textPort = node.GetInputPortByName($"ChoiceKey {index}");
+            string index = outputPort.name.Substring("Choice ".Length);
+            IPort textPort = node.GetInputPortByName($"ChoiceKey { index }");
 
-            var choiceData = new ChoiceData
+            ChoiceData choiceData = new ChoiceData
             {
-                ChoiceKey = GetPortValue<string>(textPort),
-                DesinationNodeID = outputPort.firstConnectedPort != null ? nodeIdMap[outputPort.firstConnectedPort.GetNode()] : null
+                ChoiceKey = GetPortValue<DialogueKey>(textPort),
+                DesinationNodeID = outputPort.firstConnectedPort != null ? map[outputPort.firstConnectedPort.GetNode()] : null
             };
 
-            runtimeNode.Choices.Add(choiceData);
+            r.Choices.Add(choiceData);
 
         }
-
     }
 
-    private T GetPortValue<T>(IPort port)
+    // --- IF Node ---
+    void ProcessIfNode(IF node, RuntimeIFNode r, Dictionary<INode, string> map)
+    {
+        r.ConditionKey = GetPortValue<string>(node.GetInputPortByName("Condition"));
+
+#if UNITY_EDITOR
+        // recup registry
+        if (conditionRegistry == null)
+            conditionRegistry = AssetDatabase.LoadAssetAtPath<ConditionRegistry>(
+                "Assets/Scripts/DialogueGraph/Runtime/Conditions/ConditionRegistry.asset");
+
+        // save key
+        if (conditionRegistry != null && !string.IsNullOrEmpty(r.ConditionKey))
+            conditionRegistry.Register(r.ConditionKey);
+#endif
+
+        var t = node.GetOutputPortByName("True")?.firstConnectedPort;
+        var f = node.GetOutputPortByName("False")?.firstConnectedPort;
+
+        if (t != null) r.TrueNodeId = map[t.GetNode()];
+        if (f != null) r.FalseNodeId = map[f.GetNode()];
+    }
+
+    T GetPortValue<T>(IPort port)
     {
         if (port == null) return default;
+        port.TryGetValue(out T val);
+        return val;
 
-        if (port.isConnected)
+        //if (port == null)
+        //    return default;
+
+        //// port nn connecté
+        //if (port.firstConnectedPort == null)
+        //{
+        //    port.TryGetValue(out T val);
+        //    return val;
+        //}
+
+        //// port connecté
+        //var sourcePort = port.firstConnectedPort;
+
+        //if (sourcePort.TryGetValue(out T sourceVal))
+        //    return sourceVal;
+
+        //return default;
+    }
+
+
+    private bool ValidateDialogueNode(DialogueNode node, int index)
+    {
+        Debug.Log($"<color=cyan>Node {index} - DialogueNode</color>");
+        bool hasError = false;
+        
+        var speakerKeyPort = node.GetInputPortByName("SpeakerKey");
+        if (speakerKeyPort != null && speakerKeyPort.TryGetValue(out string speakerKey) && !string.IsNullOrEmpty(speakerKey))
         {
-            if (port.firstConnectedPort.GetNode() is IVariableNode variableNode)
+            SpeakerData speakerData = GetSpeakerFromDatabase(speakerKey);
+            if (speakerData != null)
             {
-                variableNode.variable.TryGetDefaultValue(out T value);
-                return value;
+                Debug.Log($"<color=green> Speaker: { speakerData.Name } ({ speakerKey })</color>");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"<color=yellow> Speaker non défini</color>");
+        }
+
+        IPort dialogueKeyPort = node.GetInputPortByName("DialogueKey");
+        if (dialogueKeyPort != null && dialogueKeyPort.TryGetValue(out DialogueKey dialogueKey))
+        {
+            string key = dialogueKey.ToKey();
+            if (!string.IsNullOrEmpty(key))
+            {
+                string dialogueText = GetDialogueFromDatabase(key);
+                if (!string.IsNullOrEmpty(dialogueText))
+                {
+                    Debug.Log($"<color=green> Dialogue: \"{ dialogueText }\"</color>");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"<color=yellow> DialogueKey non défini</color>");
+            }
+        }
+        
+        Debug.Log("");
+        return hasError;
+    }
+
+    private bool ValidateChoiceNode(ChoiceNode node, int index)
+    {
+        Debug.Log($"<color=magenta> Node { index } - ChoiceNode</color>");
+        bool hasError = false;
+        
+        IPort speakerKeyPort = node.GetInputPortByName("SpeakerKey");
+        if (speakerKeyPort != null && speakerKeyPort.TryGetValue(out string speakerKey) && !string.IsNullOrEmpty(speakerKey))
+        {
+            var speakerData = GetSpeakerFromDatabase(speakerKey);
+            if (speakerData != null)
+            {
+                Debug.Log($"<color=green>Speaker: { speakerData.Name } ({ speakerKey })</color>");
             }
         }
 
-        port.TryGetValue(out T fallbackValue);
-        return fallbackValue;
+        IPort dialogueKeyPort = node.GetInputPortByName("DialogueKey");
+        if (dialogueKeyPort != null && dialogueKeyPort.TryGetValue(out DialogueKey dialogueKey))
+        {
+            string key = dialogueKey.ToKey();
+            if (!string.IsNullOrEmpty(key))
+            {
+                var dialogueText = GetDialogueFromDatabase(key);
+                if (!string.IsNullOrEmpty(dialogueText))
+                {
+                    Debug.Log($"<color=green>Question: \"{ dialogueText }\"</color>");
+                }
+            }
+        }
+
+        INodeOption option = node.GetNodeOptionByName("portCount");
+        option.TryGetValue(out int portCount);
+        
+        Debug.Log($"<color=cyan>Choix ({ portCount }):</color>");
+        
+        for (int i = 0; i < portCount; i++)
+        {
+            IPort choicePort = node.GetInputPortByName($"ChoiceKey {i}");
+            
+            if (choicePort != null && choicePort.TryGetValue(out DialogueKey choiceKey))
+            {
+                string key = choiceKey.ToKey();
+                if (!string.IsNullOrEmpty(key))
+                {
+                    var text = GetDialogueFromDatabase(key);
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        Debug.Log($"<color=green>{ i + 1 }.\"{ text }\"</color>");
+                    }
+                }
+            }
+        }
+        
+        Debug.Log("");
+        return hasError;
     }
 
+    private SpeakerData GetSpeakerFromDatabase(string key)
+    {
+        string[] guids = AssetDatabase.FindAssets("t:SpeakerDatatable");
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var datatable = AssetDatabase.LoadAssetAtPath<SpeakerDatatable>(path);
+            if (datatable != null)
+            {
+                var speaker = datatable.GetSpeakerByKey(key);
+                if (speaker != null)
+                    return speaker;
+            }
+        }
+        return null;
+    }
 
+    private string GetDialogueFromDatabase(string key)
+    {
+        string[] guids = AssetDatabase.FindAssets("DialogueData t:TextAsset");
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var dialogueAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
+            if (dialogueAsset != null)
+            {
+                DialogueTable table = new DialogueTable();
+                table.Load(dialogueAsset);
+                DialogueTable.Row row = table.Find_Key(key);
+                if (row != null)
+                    return row.FR;
+            }
+        }
+        return null;
+    }
 
 }
