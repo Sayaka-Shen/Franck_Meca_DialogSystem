@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: ConditionRegistry
   m_EditorClassIdentifier: Assembly-CSharp::ConditionRegistry
   Conditions:
-  - CD_HasWon
-  - CD_HasLost
+  - CD_CanPlay

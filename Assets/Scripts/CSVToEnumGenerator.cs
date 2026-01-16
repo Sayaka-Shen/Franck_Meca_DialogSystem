@@ -125,8 +125,17 @@ public class CSVToEnumGenerator : EditorWindow
         }
         
         string enumFilePath = Path.Combine(m_outputPath, $"{ m_enumName }.cs");
-        File.WriteAllText(enumFilePath, m_enumSb.ToString());
-        
+        if(Directory.Exists(enumFilePath))
+        {
+            Directory.Delete(enumFilePath, true);
+            File.WriteAllText(enumFilePath, m_enumSb.ToString());
+        }
+        else
+        {
+            File.WriteAllText(enumFilePath, m_enumSb.ToString());
+        }
+
+
         if (m_generateExtensions)
         {
             StringBuilder extSb = new StringBuilder();

@@ -7,6 +7,7 @@ using System.Linq;
 using DialogueGraph.Shared;
 using Unity.GraphToolkit;
 using UnityEditor;
+using NUnit.Framework.Internal;
 
 [ScriptedImporter(1, DialogueGraphClass.AssetExtension)]
 public class DialogueGraphImporter : ScriptedImporter
@@ -19,12 +20,17 @@ public class DialogueGraphImporter : ScriptedImporter
     public override void OnImportAsset(AssetImportContext ctx)
     {
         DialogueGraphClass editorGraph = GraphDatabase.LoadGraphForImporter<DialogueGraphClass>(ctx.assetPath);
-        
+        RuntimeDialogueGraph runtimeGraph = ScriptableObject.CreateInstance<RuntimeDialogueGraph>();
+
+        Dictionary<INode, string> nodeIdMap = new();
+
+        // --- DEBUG ---
         bool hasErrors = false;
         int nodeIndex = 1;
         
         foreach (INode node in editorGraph.GetNodes())
         {
+            // TO EDIT à voir si on peut pas le combiner en ValidateRuntimeNode()
             if (node is DialogueNode dialogueNode)
             {
                 hasErrors |= ValidateDialogueNode(dialogueNode, nodeIndex);
@@ -35,6 +41,7 @@ public class DialogueGraphImporter : ScriptedImporter
                 hasErrors |= ValidateChoiceNode(choiceNode, nodeIndex);
                 nodeIndex++;
             }
+            // validate if node
         }
         
         if (hasErrors)
@@ -46,9 +53,6 @@ public class DialogueGraphImporter : ScriptedImporter
             Debug.Log($"<color=green><b>Tous les nodes sont valides!</b></color>");
         }
         
-        RuntimeDialogueGraph runtimeGraph = ScriptableObject.CreateInstance<RuntimeDialogueGraph>();
-
-        Dictionary<INode, string> nodeIdMap = new();
 
         //  Génère TOUS les IDs
         foreach (var node in editorGraph.GetNodes())
@@ -71,7 +75,7 @@ public class DialogueGraphImporter : ScriptedImporter
 
         runtimeGraph.EntryNodeId = nodeIdMap[startOut.GetNode()];
 
-        // --- PROCESS ---
+        //// --- PROCESS ---
         foreach (var node in editorGraph.GetNodes())
         {
             RuntimeNode runtimeNode = null;
@@ -110,25 +114,27 @@ public class DialogueGraphImporter : ScriptedImporter
             }
         }
 
+
         // --- DEBUG ---
-        foreach (var node in runtimeGraph.AllNodes)
-        {
-            if (node is RuntimeDialogueNode d &&
-                !string.IsNullOrEmpty(d.NextNodeId) &&
-                !runtimeGraph.AllNodes.Any(n => n.NodeId == d.NextNodeId))
-            {
-                Debug.LogError($"❌ Broken link {node.NodeId} → {d.NextNodeId}");
-            }
 
-            if (node is RuntimeIFNode i)
-            {
-                if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.TrueNodeId))
-                    Debug.LogError($"❌ IF TRUE broken: {i.TrueNodeId}");
+        //foreach (var node in runtimeGraph.AllNodes)
+        //{
+        //    if (node is RuntimeDialogueNode d &&
+        //        !string.IsNullOrEmpty(d.NextNodeId) &&
+        //        !runtimeGraph.AllNodes.Any(n => n.NodeId == d.NextNodeId))
+        //    {
+        //        Debug.LogError($"Broken link {node.NodeId} → {d.NextNodeId}");
+        //    }
 
-                if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.FalseNodeId))
-                    Debug.LogError($"❌ IF FALSE broken: {i.FalseNodeId}");
-            }
-        }
+        //    if (node is RuntimeIFNode i)
+        //    {
+        //        if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.TrueNodeId))
+        //            Debug.LogError($"IF TRUE broken: {i.TrueNodeId}");
+
+        //        if (!runtimeGraph.AllNodes.Any(n => n.NodeId == i.FalseNodeId))
+        //            Debug.LogError($"IF FALSE broken: {i.FalseNodeId}");
+        //    }
+        //}
 
         ctx.AddObjectToAsset("RuntimeData", runtimeGraph);
         ctx.SetMainObject(runtimeGraph);
@@ -141,6 +147,13 @@ public class DialogueGraphImporter : ScriptedImporter
         r.DialogueKey = GetPortValue<DialogueKey>(node.GetInputPortByName("DialogueKey"));
         r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
         r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
+
+        //var port = node.GetInputPortByName("Humeur");
+        //Debug.Log($"Humeur connected: {port.firstConnectedPort != null}");
+
+        //var sourcePort = port.firstConnectedPort;
+        //object test = sourcePort.;
+        //if(sourcePort.TryGetValue(out var sourceVal)) Debug.Log(sourceVal);
 
         var outPort = node.GetOutputPortByName("out")?.firstConnectedPort;
         if (outPort != null)
@@ -155,7 +168,7 @@ public class DialogueGraphImporter : ScriptedImporter
         r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
         r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
 
-        foreach (var port in node.GetOutputPorts().Where(p => p.name.StartsWith("Choice ")))
+        foreach (var outputPort in node.GetOutputPorts().Where(p => p.name.StartsWith("Choice ")))
         {
             string index = outputPort.name.Substring("Choice ".Length);
             IPort textPort = node.GetInputPortByName($"ChoiceKey { index }");
@@ -163,7 +176,7 @@ public class DialogueGraphImporter : ScriptedImporter
             ChoiceData choiceData = new ChoiceData
             {
                 ChoiceKey = GetPortValue<DialogueKey>(textPort),
-                DesinationNodeID = outputPort.firstConnectedPort != null ? nodeIdMap[outputPort.firstConnectedPort.GetNode()] : null
+                DesinationNodeID = outputPort.firstConnectedPort != null ? map[outputPort.firstConnectedPort.GetNode()] : null
             };
 
             r.Choices.Add(choiceData);
@@ -199,6 +212,24 @@ public class DialogueGraphImporter : ScriptedImporter
         if (port == null) return default;
         port.TryGetValue(out T val);
         return val;
+
+        //if (port == null)
+        //    return default;
+
+        //// port nn connecté
+        //if (port.firstConnectedPort == null)
+        //{
+        //    port.TryGetValue(out T val);
+        //    return val;
+        //}
+
+        //// port connecté
+        //var sourcePort = port.firstConnectedPort;
+
+        //if (sourcePort.TryGetValue(out T sourceVal))
+        //    return sourceVal;
+
+        //return default;
     }
 
 
@@ -254,7 +285,7 @@ public class DialogueGraphImporter : ScriptedImporter
             var speakerData = GetSpeakerFromDatabase(speakerKey);
             if (speakerData != null)
             {
-                Debug.Log($"<color=green>Speaker: {speakerData.Name} ({ speakerKey })</color>");
+                Debug.Log($"<color=green>Speaker: { speakerData.Name } ({ speakerKey })</color>");
             }
         }
 

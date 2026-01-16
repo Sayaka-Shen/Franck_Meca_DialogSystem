@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using DialogueGraph.Shared;
 using UnityEngine.Audio;
+using Unity.VisualScripting;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -75,7 +76,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(id) || !lookup.TryGetValue(id, out _currentNode))
         {
-            Debug.LogError($"NodeId {id} NOT FOUND");
+            Debug.LogError($"NodeId { id } NOT FOUND");
             EndDialogue();
             return;
         }
@@ -95,15 +96,16 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        var d = _currentNode as RuntimeDialogueNode;
-        if (d == null)
+        // --- RUNTIME DIALOGUE ---
+        var runtimeDNode = _currentNode as RuntimeDialogueNode;
+        if (runtimeDNode == null)
         {
             EndDialogue();
             return;
         }
 
-        var currentSpeaker = SpeakerDatatable.GetSpeakerByKey(d.SpeakerKey);
-        DialogueTable.Row row = m_dialogueTable.Find_Key(d.DialogueKey.ToKey());
+        var currentSpeaker = SpeakerDatatable.GetSpeakerByKey(runtimeDNode.SpeakerKey);
+        DialogueTable.Row row = m_dialogueTable.Find_Key(runtimeDNode.DialogueKey.ToKey());
 
         DialoguePanel.SetActive(true);
         SpeakerNameText.text = currentSpeaker.Name;
@@ -111,17 +113,27 @@ public class DialogueManager : MonoBehaviour
 
         // ---- CHOICE ----
         // clean
-        foreach (Transform c in ChoiceButtonContainer)
-            Destroy(c.gameObject);
+        foreach (Transform choiceButton in ChoiceButtonContainer)
+            Destroy(choiceButton.gameObject);
 
         // add
-        foreach (var choice in d.Choices)
+        foreach (var choice in runtimeDNode.Choices)
         {
             var btn = Instantiate(choiceButtonPrefab, ChoiceButtonContainer);
             btn.GetComponentInChildren<TextMeshProUGUI>().text =
                 GetText(m_dialogueTable.Find_Key(choice.ChoiceKey.ToKey()));
 
             btn.onClick.AddListener(() => ShowNode(choice.DesinationNodeID));
+        }
+
+        // Speaker
+        SpeakerRImage.texture = currentSpeaker.Sprite;
+
+        if (runtimeDNode.SpeakerHumeur != HUMEUR.Defaut)
+        {
+            Debug.Log("test" + runtimeDNode.SpeakerHumeur);
+            Texture2D texture2D = currentSpeaker.GetTextByHumeur(runtimeDNode.SpeakerHumeur);
+            HumeurRImage.texture = texture2D;
         }
 
         // ---- AUDIO ----

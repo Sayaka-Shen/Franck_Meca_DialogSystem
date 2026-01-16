@@ -6,15 +6,12 @@ using DialogueGraph.Shared;
 [Serializable]
 public class RuntimeDialogueNode : RuntimeNode
 {
-    // Dialogue
-    public string NodeId;
-    public string SpeakerName;
-    
-    public DialogueKey DialogueKey;
     public string NextNodeId;
 
     // Dialogue
-    public string DialogueKey;
+    public string SpeakerName;
+    
+    public DialogueKey DialogueKey;
 
     // Choices
     public List<ChoiceData> Choices = new List<ChoiceData>();
