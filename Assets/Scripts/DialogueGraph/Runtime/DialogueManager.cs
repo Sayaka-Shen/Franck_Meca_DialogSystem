@@ -1,29 +1,26 @@
-using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using DialogueGraph.Shared;
-using TMPro;
-using Unity.GraphToolkit.Editor;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using DialogueGraph.Shared;
+using UnityEngine.Audio;
 
 public class DialogueManager : MonoBehaviour
 {
     public RuntimeDialogueGraph RuntimeGraph;
 
-    [Header("Dialogue")] 
+    [Header("Dialogue")]
     [SerializeField] private LANGUAGE m_currentLanguage;
     [SerializeField] private TextAsset m_dialogueData;
-    private DialogueTable m_dialogueTable = new DialogueTable();
+    private DialogueTable m_dialogueTable = new();
 
-    [Header("UI Components")] 
+    [Header("UI")]
     public GameObject DialoguePanel;
     public TextMeshProUGUI SpeakerNameText;
     public TextMeshProUGUI DialogueText;
 
-    [Header("Choice Button UI")]
+    [Header("Choices")]
     public Button choiceButtonPrefab;
     public Transform ChoiceButtonContainer;
 
@@ -35,139 +32,120 @@ public class DialogueManager : MonoBehaviour
     // Sound
     AudioSource audioSource;
 
-    private Dictionary<string, RuntimeDialogueNode> _nodeLookup = new Dictionary<string, RuntimeDialogueNode>();
-    private RuntimeDialogueNode _currentNode;
+    private Dictionary<string, RuntimeNode> lookup = new();
+    private RuntimeNode _currentNode;
 
-    private void Start()
+    void Start()
     {
         // Init Dialogue Table
         m_dialogueTable.Load(m_dialogueData);
 
-        Debug.Log(m_dialogueTable.IsLoaded());
-        
         // TO EDIT
         // audio
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) Debug.LogWarning("No Audio Source on Dialogue Manager");
 
-        // NODES
-        foreach (var node in RuntimeGraph.AllNodes)
-        {
-            _nodeLookup[node.NodeId] = node;
-        }
 
-        if (!string.IsNullOrEmpty(RuntimeGraph.EntryNodeId))
-        {
-            ShowNode(RuntimeGraph.EntryNodeId);
-        }
-        else
-        {
-            EndDialogue();
-        }
+        foreach (var n in RuntimeGraph.AllNodes)
+            lookup[n.NodeId] = n;
 
+        ShowNode(RuntimeGraph.EntryNodeId);
     }
 
     private void Update()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame && _currentNode != null && _currentNode.Choices.Count == 0)
+        if (Mouse.current.leftButton.wasPressedThisFrame && _currentNode != null)
         {
-            if (!string.IsNullOrEmpty(_currentNode.NextNodeId))
+            if(_currentNode is RuntimeDialogueNode rd && rd.Choices.Count == 0)
             {
-                ShowNode(_currentNode.NextNodeId);
-            }
-            else
-            {
-                EndDialogue();
+                if (!string.IsNullOrEmpty(rd.NextNodeId))
+                {
+                    ShowNode(rd.NextNodeId);
+                }
+                else
+                {
+                    EndDialogue();
+                }
             }
         }
     }
 
-    private void ShowNode(string nodeId)
+    // --- NODE ---
+    void ShowNode(string id)
     {
-        if (!_nodeLookup.ContainsKey(nodeId))
+        if (string.IsNullOrEmpty(id) || !lookup.TryGetValue(id, out _currentNode))
+        {
+            Debug.LogError($"NodeId {id} NOT FOUND");
+            EndDialogue();
+            return;
+        }
+
+        // EndNode
+        if (_currentNode is RuntimeEndNode)
         {
             EndDialogue();
             return;
         }
-        
-        _currentNode = _nodeLookup[nodeId];
-        SpeakerData currentSpeaker = SpeakerDatatable.GetSpeakerByKey(_currentNode.SpeakerKey);
-        if (currentSpeaker == null)
-            Debug.LogError($"Key Speaker {_currentNode.SpeakerKey} doesn't exist.");
 
-        // -- dialogue --
-        DialogueTable.Row dialogueRow = m_dialogueTable.Find_Key(_currentNode.DialogueKey);
+        // IF Node
+        if (_currentNode is RuntimeIFNode ifNode)
+        {
+            bool result = EvaluateCondition(ifNode.ConditionKey);
+            ShowNode(result ? ifNode.TrueNodeId : ifNode.FalseNodeId);
+            return;
+        }
+
+        var d = _currentNode as RuntimeDialogueNode;
+        if (d == null)
+        {
+            EndDialogue();
+            return;
+        }
+
+        var currentSpeaker = SpeakerDatatable.GetSpeakerByKey(d.SpeakerKey);
+        var row = m_dialogueTable.Find_Key(d.DialogueKey);
 
         DialoguePanel.SetActive(true);
-        SpeakerNameText.SetText(currentSpeaker.Name);
-        DialogueText.SetText(GetLocalizedText(dialogueRow));
-           
-        // -- choices --
-        
-        foreach (Transform child in ChoiceButtonContainer)
+        SpeakerNameText.text = currentSpeaker.Name;
+        DialogueText.text = GetText(row);
+
+        foreach (Transform c in ChoiceButtonContainer)
+            Destroy(c.gameObject);
+
+        foreach (var choice in d.Choices)
         {
-            Destroy(child.gameObject);
+            var btn = Instantiate(choiceButtonPrefab, ChoiceButtonContainer);
+            btn.GetComponentInChildren<TextMeshProUGUI>().text =
+                GetText(m_dialogueTable.Find_Key(choice.ChoiceKey));
+
+            btn.onClick.AddListener(() => ShowNode(choice.DesinationNodeID));
         }
 
-        if (_currentNode.Choices.Count > 0)
-        {
-            foreach (var choice in _currentNode.Choices)
-            {
-                Button button = Instantiate(choiceButtonPrefab, ChoiceButtonContainer);
-
-                TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
-                if (buttonText != null)
-                {
-                    buttonText.text = GetLocalizedText(m_dialogueTable.Find_Key(choice.ChoiceKey));
-                }
-
-                if(button != null)
-                {
-                    button.onClick.AddListener(() =>
-                    {
-                        if (!string.IsNullOrEmpty(choice.DesinationNodeID))
-                        {
-                            ShowNode(choice.DesinationNodeID);
-                        }
-                        else
-                        {
-                            EndDialogue();
-                        }
-                    });
-                }
-            }
-        }
-
-        // -- speaker --
-        SpeakerRImage.texture = currentSpeaker.Sprite;
-
-        if (_currentNode.SpeakerHumeur != HUMEUR.Defaut)
-        {
-            Texture2D text2D = currentSpeaker.GetTextByHumeur(_currentNode.SpeakerHumeur);
-            HumeurRImage.texture = text2D;
-        }
-
+        // audio
         audioSource.PlayOneShot(currentSpeaker.AudioClip);
     }
 
-    private void EndDialogue()
+    void EndDialogue()
     {
-        DialoguePanel.SetActive(false); 
+        DialoguePanel.SetActive(false);
         _currentNode = null;
     }
 
-    private string GetLocalizedText(DialogueTable.Row row)
+    // --- CONDITIONS ---
+    bool EvaluateCondition(string key)
     {
-        switch (m_currentLanguage)
+        return PlayerPrefs.GetInt(key, 0) == 1;
+    }
+
+    // --- TRADUCTION ---
+    string GetText(DialogueTable.Row r)
+    {
+        return m_currentLanguage switch
         {
-            case LANGUAGE.Français:
-                return row.FR;
-            case LANGUAGE.Anglais:
-                return row.AN;
-            case LANGUAGE.Espagnol:
-                return row.ES;
-            default:
-                return row.FR;
-        }
+            LANGUAGE.Français => r.FR,
+            LANGUAGE.Anglais => r.AN,
+            LANGUAGE.Espagnol => r.ES,
+            _ => r.FR
+        };
     }
 }

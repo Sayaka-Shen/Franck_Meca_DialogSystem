@@ -4,14 +4,12 @@ using NUnit.Framework;
 using DialogueGraph.Shared;
 
 [Serializable]
-public class RuntimeDialogueNode
+public class RuntimeDialogueNode : RuntimeNode
 {
-    // Dialogue
-    public string NodeId;
-    public string SpeakerName;
-
-    public string DialogueKey;
     public string NextNodeId;
+
+    // Dialogue
+    public string DialogueKey;
 
     // Choices
     public List<ChoiceData> Choices = new List<ChoiceData>();
@@ -19,5 +17,4 @@ public class RuntimeDialogueNode
     // Speaker
     public string SpeakerKey; // TO EDIT key = SPK_FirstLetter of each name
     public HUMEUR SpeakerHumeur;
-
 }

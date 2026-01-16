@@ -12,7 +12,6 @@ public class ChoiceNode : Node
     {
         context.AddInputPort("in").Build();
         
-        context.AddInputPort<string>("Speaker").Build();
         context.AddInputPort<string>("DialogueKey").Build();
 
         // Speaker
@@ -28,9 +27,13 @@ public class ChoiceNode : Node
         }
     }
 
+    //[ReadOnly]
+    //public string test = "test";
+
     protected override void OnDefineOptions(IOptionDefinitionContext context)
     {
         context.AddOption<int>(optionID).Delayed().WithDefaultValue(2);
-        //, defaultValue: 2, attributes: new Attribute[] { new DelayedAttribute() }
+        //context.AddOption<string>(test).WithDefaultValue("test");
+
     }
 }
