@@ -39,7 +39,7 @@ public class DialogueManager : MonoBehaviour
     {
         // Init Dialogue Table
         m_dialogueTable.Load(m_dialogueData);
-
+        
         // TO EDIT
         // audio
         audioSource = GetComponent<AudioSource>();
@@ -103,25 +103,28 @@ public class DialogueManager : MonoBehaviour
         }
 
         var currentSpeaker = SpeakerDatatable.GetSpeakerByKey(d.SpeakerKey);
-        var row = m_dialogueTable.Find_Key(d.DialogueKey);
+        DialogueTable.Row row = m_dialogueTable.Find_Key(d.DialogueKey.ToKey());
 
         DialoguePanel.SetActive(true);
         SpeakerNameText.text = currentSpeaker.Name;
         DialogueText.text = GetText(row);
 
+        // ---- CHOICE ----
+        // clean
         foreach (Transform c in ChoiceButtonContainer)
             Destroy(c.gameObject);
 
+        // add
         foreach (var choice in d.Choices)
         {
             var btn = Instantiate(choiceButtonPrefab, ChoiceButtonContainer);
             btn.GetComponentInChildren<TextMeshProUGUI>().text =
-                GetText(m_dialogueTable.Find_Key(choice.ChoiceKey));
+                GetText(m_dialogueTable.Find_Key(choice.ChoiceKey.ToKey()));
 
             btn.onClick.AddListener(() => ShowNode(choice.DesinationNodeID));
         }
 
-        // audio
+        // ---- AUDIO ----
         audioSource.PlayOneShot(currentSpeaker.AudioClip);
     }
 

@@ -6,6 +6,11 @@ using DialogueGraph.Shared;
 [Serializable]
 public class RuntimeDialogueNode : RuntimeNode
 {
+    // Dialogue
+    public string NodeId;
+    public string SpeakerName;
+    
+    public DialogueKey DialogueKey;
     public string NextNodeId;
 
     // Dialogue
