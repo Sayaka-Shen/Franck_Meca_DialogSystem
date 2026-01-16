@@ -146,7 +146,7 @@ public class DialogueGraphImporter : ScriptedImporter
     {
         r.DialogueKey = GetPortValue<DialogueKey>(node.GetInputPortByName("DialogueKey"));
         r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
-        r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
+        r.SpeakerHumeur = GetPortValue<HUMEUR>(node.GetInputPortByName("Humeur"));
 
         //var port = node.GetInputPortByName("Humeur");
         //Debug.Log($"Humeur connected: {port.firstConnectedPort != null}");
@@ -166,7 +166,7 @@ public class DialogueGraphImporter : ScriptedImporter
     {
         r.DialogueKey = GetPortValue<DialogueKey>(node.GetInputPortByName("DialogueKey"));
         r.SpeakerKey = GetPortValue<string>(node.GetInputPortByName("SpeakerKey"));
-        r.SpeakerHumeur = (HUMEUR)GetPortValue<int>(node.GetInputPortByName("Humeur"));
+        r.SpeakerHumeur = GetPortValue<HUMEUR>(node.GetInputPortByName("Humeur"));
 
         foreach (var outputPort in node.GetOutputPorts().Where(p => p.name.StartsWith("Choice ")))
         {
@@ -212,24 +212,6 @@ public class DialogueGraphImporter : ScriptedImporter
         if (port == null) return default;
         port.TryGetValue(out T val);
         return val;
-
-        //if (port == null)
-        //    return default;
-
-        //// port nn connecté
-        //if (port.firstConnectedPort == null)
-        //{
-        //    port.TryGetValue(out T val);
-        //    return val;
-        //}
-
-        //// port connecté
-        //var sourcePort = port.firstConnectedPort;
-
-        //if (sourcePort.TryGetValue(out T sourceVal))
-        //    return sourceVal;
-
-        //return default;
     }
 
 

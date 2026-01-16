@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ConditionController
   Conditions:
   - Key: CD_CanPlay
-    _value: 0
+    _value: 1
 --- !u!4 &309893499
 Transform:
   m_ObjectHideFlags: 0
