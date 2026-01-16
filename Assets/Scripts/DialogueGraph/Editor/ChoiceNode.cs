@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Codice.Client.Common;
 using Unity.GraphToolkit.Editor;
 using UnityEngine;
+using DialogueGraph.Shared;
 
 [Serializable]
 public class ChoiceNode : Node
@@ -16,7 +17,7 @@ public class ChoiceNode : Node
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();
-        context.AddInputPort<int>("Humeur").Build();
+        context.AddInputPort<HUMEUR>("Humeur").Build();
 
         var option = GetNodeOptionByName(optionID);
         option.TryGetValue(out int portCount);

@@ -16,6 +16,6 @@ public class DialogueNode : Node
 
         // Speaker
         context.AddInputPort<string>("SpeakerKey").Build();
-        context.AddInputPort<int>("Humeur").WithDefaultValue(0).Build();
+        context.AddInputPort<HUMEUR> ("Humeur").WithDefaultValue(0).Build();
     }
 }
