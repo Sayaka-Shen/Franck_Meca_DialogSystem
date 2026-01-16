@@ -197,7 +197,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   curveSamples: 80
-  rotationAxisIndex: 1
+  rotationAxisIndex: 2
   turnModeIndex: 4
   stepAngle: 90
   useOppositeKey: 1
